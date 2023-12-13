@@ -30,7 +30,7 @@ class ParameterisedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField
 
 class VendorSerializer(serializers.ModelSerializer):
     """
-    This class is model serializer for converting model object to json data
+    This class is model serializer for converting vendor model object to json data
     its used for converting vendor data to json data
     """
     vendor_code = serializers.CharField(read_only=True)
@@ -43,7 +43,7 @@ class VendorSerializer(serializers.ModelSerializer):
         
 class PurchaseOrderSerializer(serializers.ModelSerializer):
     """
-    This class is model serializer for converting model object to json data
+    This class is model serializer for converting purchase order model object to json data
     its used to convert purchace order data to json
     """
     po_number = serializers.CharField(read_only=True)
@@ -62,7 +62,7 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
 
 class VendorPerformanceSerializer(serializers.ModelSerializer):
     """
-    This class is model serializer for converting model object to json data
+    This class is model serializer for converting vendor performance model data object to json data
     its used for converting metric data of vendor to json
     """
     vendor_code = serializers.CharField(read_only=True)
@@ -73,8 +73,8 @@ class VendorPerformanceSerializer(serializers.ModelSerializer):
         
 class PurchaseOrderUpdateSerializer(serializers.ModelSerializer):
     """
-    This class is model serializer for converting model object to json data
-    its used for converting purchace acknowledge data into json and also used for updating the same field
+    This class is model serializer for converting acknowledgment date from json to model object
+    its used for converting purchace acknowledge data into json
     """
     po_number = serializers.CharField(read_only=True)
     class Meta:

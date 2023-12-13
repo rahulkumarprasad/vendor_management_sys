@@ -19,8 +19,8 @@ from api import urls as api_url
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
-from rest_framework_simplejwt import authentication
 
+#initalizing sagger API's
 schema_view = get_schema_view(
    openapi.Info(
       title="Vendor Managment Api",
@@ -32,7 +32,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path("api/",include(api_url)),
 
     #swagger urls

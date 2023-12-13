@@ -1,5 +1,6 @@
 from drf_yasg import openapi
 
+# decalearing schema for performasce API sagger response
 VENDOR_SCHEMA = {
 "vendor_code":{"type":"string",
         "title": "Vendor code",

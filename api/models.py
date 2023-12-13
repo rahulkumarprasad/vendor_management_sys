@@ -3,9 +3,11 @@ import uuid
 import random
 
 def create_new_odr_number():
+      """This function is used for generating random string number"""
       return str(random.randint(1000000000, 9999999999))
 
 class Vendor(models.Model):
+    """This models is used for storing data related to vendors"""
     vendor_code = models.CharField(primary_key=True, unique=True, max_length=36, default=uuid.uuid4)
     name = models.CharField(max_length = 200)
     contact_details = models.TextField()
@@ -19,6 +21,7 @@ class Vendor(models.Model):
          return f"{self.name}: ({self.vendor_code})"
 
 class PurchaseOrder(models.Model):
+    """This model is used for storing data related to purchase orders"""
     STATUS_CONSTANTS = [("pending","pending"),("completed","completed"),("canceled","canceled")]
     po_number = models.CharField(primary_key=True, max_length=10, unique=True, default=create_new_odr_number)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
@@ -37,6 +40,7 @@ class PurchaseOrder(models.Model):
          return f"{self.vendor.name}: ({self.po_number})"
 
 class HistoricalPerformance(models.Model):
+    """This model is used for storing historical data related to vendor performance"""
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     on_time_delivery_rate = models.FloatField()

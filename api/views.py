@@ -12,12 +12,15 @@ from .response_schema import VendorPerformanceSchema
 
 class VendorViewSet(ModelViewSet):
     """
-    This Vendor view set is used for CRUD operation on Vendor data"""
+    This Vendor view set is used for CRUD operation on Vendor model
+    """
     serializer_class = VendorSerializer
     queryset = Vendor.objects.all()
 
 class PurchaseOrderViewSet(ModelViewSet):
-    """This model view set is used for CRUD operation on PurchaseOrder data"""
+    """
+    This Purchase Order view set is used for CRUD operation on PurchaseOrder model
+    """
     serializer_class = PurchaseOrderSerializer
     queryset = PurchaseOrder.objects.all()
 
@@ -39,7 +42,7 @@ class VendorPerformance(APIView):
             return Response({"error":f"Exception occured, message: {e}"}, status=500)
 
 class PurchaseOrderAck(UpdateModelMixin, GenericAPIView):
-    """This view is used for updating acknowledge date of PurchaseOrder"""
+    """This api view is used for updating acknowledge date of PurchaseOrder data"""
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderUpdateSerializer
 

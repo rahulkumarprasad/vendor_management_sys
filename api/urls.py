@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
 
+#registering modelviewset views
 router.register("vendors", VendorViewSet)
 router.register("purchase_orders", PurchaseOrderViewSet)
 
