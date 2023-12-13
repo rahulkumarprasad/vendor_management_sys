@@ -13,9 +13,13 @@ def update_metrics(sender, instance, **kwargs):
     This function will be executed on each time with changes in PurchaseOrder model and the metrics data is calculated for only update query
     and it is used for calculating vendor metrics
     """
-    if instance.po_number is not None: 
-        #logic for update case
+    try:
         previous = PurchaseOrder.objects.select_related("vendor").get(po_number=instance.po_number)
+    except:
+        previous = None
+
+    if previous is not None: 
+        #logic for update case
         vendor = previous.vendor
 
         try:
