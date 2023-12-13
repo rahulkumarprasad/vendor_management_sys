@@ -4,8 +4,14 @@ from .models import PurchaseOrder, HistoricalPerformance
 from django.db.models import Q, Count, Sum, DurationField, ExpressionWrapper, F
 from datetime import timedelta
 
-def get_total_hours_from_timedelta(data):
-    return round(data.total_seconds()/(60*60),2)
+def get_total_hours_from_timedelta(time_delt_obj):
+    """This function is used for converting timedelta object to hours
+    :params:
+        time_delt_obj: "time delta object"
+    :return:
+        float value representing total hours
+    """
+    return round(time_delt_obj.total_seconds()/(60*60),2)
 
 @receiver(pre_save, sender=PurchaseOrder)
 def update_metrics(sender, instance, **kwargs):
@@ -13,22 +19,23 @@ def update_metrics(sender, instance, **kwargs):
     This function will be executed on each time with changes in PurchaseOrder model and the metrics data is calculated for only update query
     and it is used for calculating vendor metrics
     """
+    # getting records from purchase order table for checking weather current instance model object is new object or updated object 
     try:
         previous = PurchaseOrder.objects.select_related("vendor").get(po_number=instance.po_number)
     except:
         previous = None
 
     if previous is not None: 
-        #logic for update case
+        #logic for handling update case
         vendor = previous.vendor
 
         try:
-            #getting latest history data
+            #getting latest history data for the vendor
             latest_performance_history = HistoricalPerformance.objects.filter(vendor=vendor).order_by("-date").first()
         except:
             latest_performance_history = None
 
-        #creating new history data for saving details
+        #creating new history data for saving new details
         new_history_rec = HistoricalPerformance(vendor = vendor,
             on_time_delivery_rate = (latest_performance_history.on_time_delivery_rate if latest_performance_history else 0), 
             quality_rating_avg = (latest_performance_history.quality_rating_avg if latest_performance_history else 0), 
@@ -47,15 +54,23 @@ def update_metrics(sender, instance, **kwargs):
         
         if previous.status != instance.status:
             handel_fulfilment_rate(instance, vendor, latest_performance_history, new_history_rec)
-            
+        
+        #saving new details
         vendor.save()
         new_history_rec.save()
 
 def handel_on_time_delevery_rate(vendor, instance, latest_performance_history, new_history_rec):
+    """
+    This is calculated each time a PO status changes to 'completed
+    :params:
+        vendor: "current vendor object"
+        instance: "current instance or purchase order model"
+        latest_performance_history: "latest object record from historical performance model"
+        new_history_rec: "new object of historical performance model"
+    """
     #logic for handlaing On-Time Delivery Rate
-
     if latest_performance_history:
-        
+
         on_time_completed_count = PurchaseOrder.objects.filter(Q(vendor=vendor) & Q(status="completed") & 
                     Q(delivery_date__lte = F("expected_delivery_date")) &
                         ~Q(po_number=instance.po_number) & Q(modified_date__gt=latest_performance_history.date)).count()
@@ -86,11 +101,16 @@ def handel_on_time_delevery_rate(vendor, instance, latest_performance_history, n
         new_history_rec.json_data["on_time_total_completed_order"] = on_time_total_completed_order
         new_history_rec.on_time_delivery_rate = result
 
-
 def handel_quality_rate_average(instance, vendor, latest_performance_history, new_history_rec):
+    """
+    This is calculated upon the completion of each PO where a quality_rating is provided
+    :params:
+        vendor: "current vendor object"
+        instance: "current instance or purchase order model"
+        latest_performance_history: "latest object record from historical performance model"
+        new_history_rec: "new object of historical performance model"
+    """
     #logic for handlaing Quality Rating Average
-    #null fields will be ignored
-    #adding one for current order
     if latest_performance_history:
         query_res = PurchaseOrder.objects.filter(Q(vendor=vendor) & Q(status="completed") &
                     ~Q(quality_rating=None) & ~Q(po_number=instance.po_number) & 
@@ -128,6 +148,14 @@ def handel_quality_rate_average(instance, vendor, latest_performance_history, ne
 
 
 def handel_average_response_time(instance, vendor, latest_performance_history, new_history_rec):
+    """
+    This is calculated each time a PO is acknowledged by the vendor.
+    :params:
+        vendor: "current vendor object"
+        instance: "current instance or purchase order model"
+        latest_performance_history: "latest object record from historical performance model"
+        new_history_rec: "new object of historical performance model"
+    """
     #logic for handlaing Average Response Time
     #null values will be ignored
     if latest_performance_history:
@@ -171,6 +199,14 @@ def handel_average_response_time(instance, vendor, latest_performance_history, n
     new_history_rec.average_response_time = total_hours
 
 def handel_fulfilment_rate(instance, vendor, latest_performance_history, new_history_rec):
+    """
+    This is calculated upon any change in PO status.
+    :params:
+        vendor: "current vendor object"
+        instance: "current instance or purchase order model"
+        latest_performance_history: "latest object record from historical performance model"
+        new_history_rec: "new object of historical performance model"
+    """
     #logic for handlaing Fulfilment Rate
     #adding one for current order
     if latest_performance_history:

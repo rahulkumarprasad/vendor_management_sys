@@ -1,0 +1,82 @@
+################################Vendor Management System with Performance Metrics#######################
+
+Developed a Vendor Management System using Django and Django REST Framework. This
+system will handle vendor profiles, track purchase orders, and calculate vendor performance
+metrics. In this application we have used followings-
+  Database: sqlite3
+  Api Package: djangorestframework
+  Swagger package: drf-yasg
+  Authentication package: djangorestframework-simplejwt
+  Test suite package: pytest
+
+Core Features and API's:
+  
+  1. JWT Token Manager:
+    ● Test User: 
+      username: "admin"
+      password: "admin"
+    ● API Endpoints:
+      ● POST /api/token/: Generate new access token and refresh token for user.
+      ● POST /token/refresh/: Generates new access token from refresh token.
+    ● Note: Accessa token expiry is 30 minutes and access token expirt is 1 hours
+    
+
+  2. Vendor Profile Management:
+    ● Model Design: model to store vendor information including name, contact details, address, and a unique vendor code.
+    ● API Endpoints:
+      ● POST /api/vendors/: Create a new vendor.
+      ● GET /api/vendors/: List all vendors.
+      ● GET /api/vendors/{vendor_id}/: Retrieve a specific vendor's details.
+      ● PUT /api/vendors/{vendor_id}/: Update a vendor's details.
+      ● DELETE /api/vendors/{vendor_id}/: Delete a vendor.
+      ● GET /api/vendors/{vendor_id}/performance: Retrieve a specific vendor's performance details.
+
+  3. Purchase Order Tracking:
+    ● Model Design: Model to store purchase orders with fields like PO number, vendor reference, order date, delivery_date, expected_delivery_date,  items, quantity, quality_rating, acknowledgment_date, issue_date, modified_date and status.
+    ● API Endpoints:
+      ● POST /api/purchase_orders/: Create a purchase order.
+      ● GET /api/purchase_orders/: List all purchase orders with an option to filter by vendor.
+      ● GET /api/purchase_orders/{po_id}/: Retrieve details of a specific purchase order.
+      ● PUT /api/purchase_orders/{po_id}/: Update a purchase order.
+      ● DELETE /api/purchase_orders/{po_id}/: Delete a purchase order.
+      ● PUT /api/purchase_orders/{po_id}/acknowledge: Update a purchase order acknowledgment_date.
+
+  4. Vendor Performance Evaluation:
+    ● Metrics: This application will calculate following for each vendor
+      ● On-Time Delivery Rate: Percentage of orders delivered by the promised date.
+      ● Quality Rating: Average of quality ratings given to a vendor’s purchase orders.
+      ● Response Time: Average time taken by a vendor to acknowledge or respond to purchase orders.
+      ● Fulfilment Rate: Percentage of purchase orders fulfilled without issues.
+    ● API Endpoints:
+      ● GET /api/vendors/{vendor_id}/performance: Retrieve a vendor's performance metrics.
+    
+  5. Sagger Api Documentation:
+    ● Web Page: We have integrated swagger documentation for getting all details regarding API's, visite following endpoint for swagger document.
+    ● API Endpoints:
+      ● GET /swagger/: Swagger documentation for all the API in the application also allows testing for the application.
+      ● GET /redoc/: Swagger documentation for all the API and its schemas.
+
+################################### Running application guide ##################################
+- First we need to pull the code and then go to the project directory.
+- Now we need to create python virtual environment and activate the virtual environment and then install all the packages from requirement.txt file.
+  > pip install -r requirements.txt
+- After install all the requirements we need to now do database change.
+- I am using sqlite3 django default database, if we want we can change our database by making change in settings.py file.
+- Note i have already created the sqlite3 database and its in my reposetory with sample data, we can delete that file and can create new database with following code.
+  > python manage.py makemigrations
+  > python manage.py migrate
+- After database setup we need to run our application with following command
+  > python manage.py runserver
+- Now we also have to create new user for generating token but if we are using same database from reposetry then we just need to call the token generate API with username and password.
+  # creating user if needed
+  > python manage.py createsuperuser
+- After running application we can visite swagger website in browser and can test all the endpoints by generating token and authenticating.
+  swagger_url: http://localhost:7000/swagger/
+  swagger_docs_url: http://localhost:7000/redoc/
+
+#################################### Testing Application With TestCase ############################
+- I am using pytest for testing all API's
+- For running test case we need to just go to project directory and then we have to install all the packages from requirement.txt file.
+  > pip install -r requirements.txt
+- After install all requirements we need to run one simple code as below
+  > pytest
